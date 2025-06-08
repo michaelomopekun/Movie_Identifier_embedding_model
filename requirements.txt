@@ -1,11 +1,11 @@
 fastapi==0.104.1
 python-multipart==0.0.6
 numpy>=1.21.0
-opencv-python==4.8.1.78
+opencv-python-headless==4.8.1.78
 Pillow==10.1.0
 requests==2.31.0
 python-dotenv==1.0.0
 onnxruntime-gpu==1.16.3
 transformers==4.35.2
-torch==2.1.0
+torch==2.1.0+cpu
 uvicorn==0.24.0
