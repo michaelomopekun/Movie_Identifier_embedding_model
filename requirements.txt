@@ -1,3 +1,5 @@
+setuptools>=42
+wheel
 fastapi==0.104.1
 python-multipart==0.0.6
 numpy==1.24.3
