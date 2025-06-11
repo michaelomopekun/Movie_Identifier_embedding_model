@@ -2,7 +2,7 @@ setuptools>=42
 wheel
 fastapi==0.104.1
 python-multipart==0.0.6
-numpy==1.24.3
+numpy==1.26.4
 opencv-python-headless==4.8.1.78
 Pillow==10.1.0
 requests==2.31.0
