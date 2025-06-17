@@ -9,6 +9,6 @@ requests==2.31.0
 python-dotenv==1.0.0
 onnxruntime==1.17.0
 transformers==4.35.2
-torch==2.1.0
+torch==2.2.0
 uvicorn==0.24.0
 gunicorn==21.2.0
