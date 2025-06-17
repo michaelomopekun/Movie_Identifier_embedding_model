@@ -1,11 +1,10 @@
 import os
 import shutil
-import numpy as np
 from pathlib import Path
 from utils.logger import logger
+from Service.model_manager import model_manager
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from model.embedding_response_model import EmbeddingResponseModel
-# from Interface.embedding_service_interface import IEmbeddingService
 from Service.embedding_service import EmbeddingService as _embeddingService
 
 router = APIRouter()
@@ -14,17 +13,21 @@ parent_dir = Path(__file__).resolve().parent.parent
 
 
 @router.post("/embeddingModel", response_model=EmbeddingResponseModel)
-def extract_embedding(file: UploadFile = File(...)):
+async def extract_embedding(file: UploadFile = File(...)):
 
     try:
+        
+        onnx_url = os.getenv("ONNX_MODEL_URL")
+
+        parent = parent_dir / "onnx" / "visual.onnx"
+        if not parent.exists():
+            await model_manager.download_model(onnx_url, parent)
 
         temp_dir = "client_uploads"
 
         os.makedirs(temp_dir, exist_ok=True)
 
         temp_file_path = os.path.join(temp_dir, file.filename)
-
-        temp_model_path = os.path.join(parent_dir, "onnx", "visual.onnx")
 
         with open(temp_file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
@@ -39,12 +42,10 @@ def extract_embedding(file: UploadFile = File(...)):
 
     except Exception as e:
         logger.error(f"Error processing file {file.filename}: {str(e)}")
-        if os.path.exists(temp_model_path):
-            os.remove(temp_model_path)
+        # model_manager.cleanup_model()
         raise HTTPException(status_code=500, detail=str(e.args))
     
     finally:
         if os.path.exists(temp_file_path):
             os.remove(temp_file_path)
-        if os.path.exists(temp_model_path):
-            os.remove(temp_model_path)
+

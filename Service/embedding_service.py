@@ -5,6 +5,7 @@ import requests
 # import tempfile
 import numpy as np
 from PIL import Image
+from tqdm import tqdm
 from pathlib import Path
 import onnxruntime as ort
 from dotenv import load_dotenv
@@ -12,6 +13,7 @@ from utils.logger import logger
 from transformers import CLIPProcessor
 from fastapi import UploadFile, HTTPException
 from Interface.embedding_service_interface import IEmbeddingService
+from Service.model_manager import model_manager
 
 
 load_dotenv()
@@ -19,23 +21,15 @@ load_dotenv()
 onnxUrl = os.getenv("ONNX_MODEL_URL")
 # token = os.getenv("Hugging_Face_Authorization_Token")
 
-parent_dir = Path(__file__).resolve().parent
+parent_dir = Path(__file__).resolve().parent.parent
 
 path_onnx = parent_dir / "onnx" / "visual.onnx"
 
 model_path=str(path_onnx)
 
-if not path_onnx.exists():
-    response = requests.get(onnxUrl, headers={
-        "User-Agent": "Mozilla/5.0",
-        # "Authorization": token
-    })
-    path_onnx.parent.mkdir(parents=True, exist_ok=True)
-    print("DownLoading visual.onnx model...")
 
-    response.raise_for_status()
-    with open(path_onnx, "wb") as f:
-        f.write(response.content)
+if not path_onnx.exists():
+    model_manager.download_model(onnxUrl, path_onnx)
 
 
 class EmbeddingService(IEmbeddingService):
