@@ -24,6 +24,8 @@ def extract_embedding(file: UploadFile = File(...)):
 
         temp_file_path = os.path.join(temp_dir, file.filename)
 
+        temp_model_path = os.path.join(parent_dir, "onnx", "visual.onnx")
+
         with open(temp_file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
@@ -42,3 +44,5 @@ def extract_embedding(file: UploadFile = File(...)):
     finally:
         if os.path.exists(temp_file_path):
             os.remove(temp_file_path)
+        if os.path.exists(temp_model_path):
+            os.remove(temp_model_path)
