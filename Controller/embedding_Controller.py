@@ -39,6 +39,8 @@ def extract_embedding(file: UploadFile = File(...)):
 
     except Exception as e:
         logger.error(f"Error processing file {file.filename}: {str(e)}")
+        if os.path.exists(temp_model_path):
+            os.remove(temp_model_path)
         raise HTTPException(status_code=500, detail=str(e.args))
     
     finally:

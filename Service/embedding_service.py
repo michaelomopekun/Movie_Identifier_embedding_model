@@ -7,10 +7,10 @@ import numpy as np
 from PIL import Image
 from pathlib import Path
 import onnxruntime as ort
-from fastapi import UploadFile
 from dotenv import load_dotenv
 from utils.logger import logger
 from transformers import CLIPProcessor
+from fastapi import UploadFile, HTTPException
 from Interface.embedding_service_interface import IEmbeddingService
 
 
@@ -123,4 +123,4 @@ class EmbeddingService(IEmbeddingService):
         
         except Exception as e:
             logger.error(f"Error embedding video scene {video_path}: {str(e)}")
-            raise ValueError(f"Failed to embed video scene: {video_path}") from e
+            raise HTTPException(status_code=500, detail=f"{type(e).__name__}: {str(e)}")
