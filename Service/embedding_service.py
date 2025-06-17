@@ -23,6 +23,8 @@ parent_dir = Path(__file__).resolve().parent
 
 path_onnx = parent_dir / "onnx" / "visual.onnx"
 
+model_path=str(path_onnx)
+
 if not path_onnx.exists():
     response = requests.get(onnxUrl, headers={
         "User-Agent": "Mozilla/5.0",
@@ -38,17 +40,17 @@ if not path_onnx.exists():
 
 class EmbeddingService(IEmbeddingService):
 
-    def __init__(self, model_path=str(path_onnx), num_frames = None):
+    def __init__(self, num_frames = None):
         
         self.num_frames = int(num_frames or os.getenv("NUMBER_OF_FRAMES"))
 
         # Initialize onnx
-        providers = ['DmlExecutionProvider']
+        # providers = ['DmlExecutionProvider']
 
-        self.session = ort.InferenceSession(model_path, providers=providers)
+        self.session = None
 
         # Initialize clip
-        self.processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch16")
+        self.processor = None
 
 
     def extract_frames(self, videoPath: str) -> list:
@@ -95,6 +97,13 @@ class EmbeddingService(IEmbeddingService):
     def embed_video_scene(self, video_path: str) -> list:
         
         try:
+
+            if self.processor is None:
+                self.processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch16")
+
+            if self.session is None:
+                self.session = ort.InferenceSession(model_path, providers=['CPUExecutionProvider'])
+
 
             frames = self.extract_frames(video_path)
             if not frames:
