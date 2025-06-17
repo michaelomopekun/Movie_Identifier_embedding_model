@@ -123,4 +123,4 @@ class EmbeddingService(IEmbeddingService):
         
         except Exception as e:
             logger.error(f"Error embedding video scene {video_path}: {str(e)}")
-            raise ValueError(f"Failed to embed video scene: {video_path}") from e
+            raise HTTPException(status_code=500, detail=f"{type(e).__name__}: {str(e)}")
