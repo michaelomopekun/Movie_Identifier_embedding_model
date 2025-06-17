@@ -109,7 +109,7 @@ class EmbeddingService(IEmbeddingService):
             if not frames:
                 raise ValueError(f"No frames extracted from video: {video_path}")
 
-            inputs = self.processor(images=frames, return_tensors="pt", padding=True)["pixel_values"].numpy()
+            inputs = self.processor(images=frames, return_tensors="pt", padding=True)["pixel_values"].numpy().astype(np.float16)
 
             outputs = self.session.run(None, {"input": inputs})
 
