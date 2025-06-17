@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from Service.model_manager import model_manager
@@ -31,6 +32,19 @@ app = FastAPI(
     ],
 )
 
-
 #routers
 app.include_router(router)
+
+@app.on_event("startup")
+async def download_model_on_startup():
+
+    onnxUrl = os.getenv("ONNX_MODEL_URL")
+    if not onnxUrl:
+        logger.error("ONNX_MODEL_URL environment variable is not set.")
+        raise ValueError("ONNX_MODEL_URL environment variable is required.")
+    
+    if not model_manager.path_onnx.exists():
+        await model_manager.download_model(onnxUrl, model_manager.path_onnx)
+
+    logger.info("ONNX model downloaded successfully.")
+    

@@ -1,11 +1,9 @@
 import os
 import cv2
-import datetime
-import requests
+import asyncio
 # import tempfile
 import numpy as np
 from PIL import Image
-from tqdm import tqdm
 from pathlib import Path
 import onnxruntime as ort
 from dotenv import load_dotenv
@@ -26,10 +24,6 @@ parent_dir = Path(__file__).resolve().parent.parent
 path_onnx = parent_dir / "onnx" / "visual.onnx"
 
 model_path=str(path_onnx)
-
-
-if not path_onnx.exists():
-    model_manager.download_model(onnxUrl, path_onnx)
 
 
 class EmbeddingService(IEmbeddingService):
@@ -92,6 +86,9 @@ class EmbeddingService(IEmbeddingService):
         
         try:
 
+            if not os.path.exists(model_path):
+                raise HTTPException(500, detail=f"ONNX model not found at {model_path}")
+
             if self.processor is None:
                 self.processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch16")
 
@@ -117,4 +114,4 @@ class EmbeddingService(IEmbeddingService):
         
         except Exception as e:
             logger.error(f"Error embedding video scene {video_path}: {str(e)}")
-            raise HTTPException(status_code=500, detail=f"{type(e).__name__}: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"EmbeddingError: {str(e)}")
