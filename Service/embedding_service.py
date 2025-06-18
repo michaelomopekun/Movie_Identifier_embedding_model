@@ -8,7 +8,7 @@ from pathlib import Path
 import onnxruntime as ort
 from dotenv import load_dotenv
 from utils.logger import logger
-from transformers import CLIPProcessor
+from transformers import CLIPImageProcessor
 from fastapi import UploadFile, HTTPException
 from Interface.embedding_service_interface import IEmbeddingService
 from Service.model_manager import model_manager
@@ -90,7 +90,7 @@ class EmbeddingService(IEmbeddingService):
                 raise HTTPException(500, detail=f"ONNX model not found at {model_path}")
 
             if self.processor is None:
-                self.processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch16")
+                self.processor = CLIPImageProcessor.from_pretrained("openai/clip-vit-base-patch16")
 
             if self.session is None:
                 self.session = ort.InferenceSession(model_path, providers=['CPUExecutionProvider'])
@@ -100,7 +100,7 @@ class EmbeddingService(IEmbeddingService):
             if not frames:
                 raise ValueError(f"No frames extracted from video: {video_path}")
 
-            inputs = self.processor(images=frames, return_tensors="pt", padding=True)["pixel_values"].numpy().astype(np.float16)
+            inputs = self.processor(images=frames, return_tensors="np", padding=True)["pixel_values"].astype(np.float16)
 
             outputs = self.session.run(None, {"input": inputs})
 
