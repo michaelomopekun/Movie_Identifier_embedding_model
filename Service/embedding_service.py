@@ -19,9 +19,9 @@ load_dotenv()
 onnxUrl = os.getenv("ONNX_MODEL_URL")
 # token = os.getenv("Hugging_Face_Authorization_Token")
 
-parent_dir = Path(__file__).resolve().parent.parent
+# parent_dir = Path(__file__).resolve().parent.parent
 
-path_onnx = parent_dir / "onnx" / "visual.onnx"
+path_onnx = Path("/app/onnx/visual.onnx")
 
 model_path=str(path_onnx)
 

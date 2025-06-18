@@ -10,7 +10,7 @@ from utils.logger import logger
 class ModelManager:
 
     def __init__(self):
-        self.path_onnx = Path(__file__).resolve().parent.parent / "onnx" / "visual.onnx"
+        self.path_onnx = Path("/app/onnx/visual.onnx")
         atexit.register(self.cleanup_model)
 
     async def cleanup_model(self):
