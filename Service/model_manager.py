@@ -18,12 +18,14 @@ class ModelManager:
 
     async def cleanup_model(self):
         try:
-            logger.info("========⌚Initializing ONNX model cleanup...========")
+            # logger.info("========⌚Initializing ONNX model cleanup...========")
 
-            if self.path_onnx.exists():
-                loop = asyncio.get_event_loop()
-                await loop.run_in_executor(None, os.remove, str(self.path_onnx))
-                logger.info(f"=======✅Successfully cleaned up ONNX model at {self.path_onnx}========")
+            # if self.path_onnx.exists():
+            #     loop = asyncio.get_event_loop()
+            #     await loop.run_in_executor(None, os.remove, str(self.path_onnx))
+            #     logger.info(f"=======✅Successfully cleaned up ONNX model at {self.path_onnx}========")
+
+            logger.info("========⌚not cleaning up ONNX model at the moment😉...========")
 
         except Exception as e:
             logger.error(f"=======❌Failed to cleanup ONNX model: {str(e)}========")
