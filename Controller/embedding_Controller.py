@@ -19,13 +19,15 @@ async def extract_embedding(file: UploadFile = File(...)):
         
         onnx_url = os.getenv("ONNX_MODEL_URL")
 
-        parent = parent_dir / "onnx" / "visual.onnx"
+        # parent = parent_dir / "onnx" / "visual.onnx"
+        parent = Path("/app/onnx/visual.onnx")
         if not parent.exists():
-            logger.info("Downloading ONNX model...")
+            logger.info("⌚========Initializing ONNX model download...========")
+
             if not onnx_url:
                 raise ValueError("ONNX_MODEL_URL environment variable is not set.")
             
-            # await model_manager.download_model(onnx_url, parent)
+            await model_manager.download_model(onnx_url, parent)
 
         temp_dir = "client_uploads"
 
@@ -45,7 +47,7 @@ async def extract_embedding(file: UploadFile = File(...)):
         return {"embedding": result}
 
     except Exception as e:
-        logger.error(f"Error processing file {file.filename}: {str(e)}")
+        logger.error(f"========❌Error processing file {file.filename}: {str(e)}========")
         # model_manager.cleanup_model()
         raise HTTPException(status_code=500, detail=str(e))
     
