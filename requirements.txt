@@ -22,3 +22,6 @@ onnxruntime==1.22.0
 
 # Transformers
 transformers==4.35.2
+
+# PyTorch (CPU-only)
+torch==2.2.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
