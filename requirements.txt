@@ -22,3 +22,5 @@ onnxruntime==1.22.0
 
 # Transformers
 transformers==4.35.2
+
+ffmpeg-python==0.2.0
