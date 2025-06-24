@@ -1,7 +1,6 @@
 import os
 import cv2
 import ffmpeg
-import tempfile
 import traceback
 import subprocess
 import numpy as np
