@@ -6,8 +6,13 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     build-essential \
     libgl1 \
-    ffmpeg \
     && rm -rf /var/lib/apt/lists/*
+
+# Install static ffmpeg + ffprobe
+RUN curl -L https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz | tar xJ \
+ && mv ffmpeg-*-static/ffmpeg /usr/local/bin/ \
+ && mv ffmpeg-*-static/ffprobe /usr/local/bin/ \
+ && rm -rf ffmpeg-*-static
 
 # Install dependencies into a temp dir
 COPY requirements.txt .
