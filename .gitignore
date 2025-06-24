@@ -2,3 +2,13 @@
 logs/
 client_uploads/
 onnx/
+.dockerignore
+.devcontainer/
+.github/
+*.code-workspace
+.vscode/
+.github/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
