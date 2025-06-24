@@ -30,9 +30,10 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y libgl1 && rm -rf /var/lib/apt/lists/*
 
-# Copy dependencies and app
+# Copy dependencies and binaries
 COPY --from=builder /install /usr/local
-COPY . .
+COPY --from=builder /usr/local/bin/ffmpeg /usr/local/bin/ffmpeg
+COPY --from=builder /usr/local/bin/ffprobe /usr/local/bin/ffprobe
 
 ENV PORT=8000
 EXPOSE 8000
