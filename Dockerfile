@@ -35,6 +35,9 @@ COPY --from=builder /install /usr/local
 COPY --from=builder /usr/local/bin/ffmpeg /usr/local/bin/ffmpeg
 COPY --from=builder /usr/local/bin/ffprobe /usr/local/bin/ffprobe
 
+# Copy app source code
+COPY . .
+
 ENV PORT=8000
 EXPOSE 8000
 
