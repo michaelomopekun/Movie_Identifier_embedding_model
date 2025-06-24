@@ -10,9 +10,10 @@ from utils.logger import logger
 class ModelManager:
 
     def __init__(self):
-        self.path_onnx = Path("/app/onnx/visual.onnx")
-        # parent_dir = Path(__file__).resolve().parent.parent
-        # self.path_onnx = parent_dir / "onnx" / "visual.onnx"
+        
+        # Initialize paths
+        parent_dir = Path(__file__).resolve().parent.parent
+        self.path_onnx = Path(os.getenv("ONNX_MODEL_prod_PATH", parent_dir / "onnx" / "visual.onnx"))
 
         atexit.register(self.cleanup_model)
 
@@ -25,7 +26,7 @@ class ModelManager:
             #     await loop.run_in_executor(None, os.remove, str(self.path_onnx))
             #     logger.info(f"=======✅Successfully cleaned up ONNX model at {self.path_onnx}========")
 
-            logger.info("========⌚not cleaning up ONNX model at the moment😉...========")
+            logger.info("========⌚not gonna cleaning up ONNX model at the moment😉...========")
 
         except Exception as e:
             logger.error(f"=======❌Failed to cleanup ONNX model: {str(e)}========")

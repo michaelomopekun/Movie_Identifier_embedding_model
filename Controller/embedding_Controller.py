@@ -19,8 +19,8 @@ async def extract_embedding(file: UploadFile = File(...)):
         
         onnx_url = os.getenv("ONNX_MODEL_URL")
 
-        # parent = parent_dir / "onnx" / "visual.onnx"
-        parent = Path("/app/onnx/visual.onnx")
+        parent = Path(os.getenv("ONNX_MODEL_prod_PATH", parent_dir / "onnx" / "visual.onnx"))
+
         if not parent.exists():
             logger.info("⌚========Initializing ONNX model download...========")
 
@@ -29,16 +29,22 @@ async def extract_embedding(file: UploadFile = File(...)):
             
             await model_manager.download_model(onnx_url, parent)
 
-        temp_dir = "client_uploads"
+        client_upload_temp_dir = "client_uploads"
+
+        os.makedirs(client_upload_temp_dir, exist_ok=True)
+
+        temp_dir =  "temp"
 
         os.makedirs(temp_dir, exist_ok=True)
 
-        temp_file_path = os.path.join(temp_dir, file.filename)
+        temp_file_path = os.path.join(temp_dir, "converted.mp4")
 
-        with open(temp_file_path, "wb") as buffer:
+        client_upload_temp_file_path = os.path.join(client_upload_temp_dir, file.filename)
+
+        with open(client_upload_temp_file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
-        raw_results = embedding_service.embed_video_scene(temp_file_path)
+        raw_results = embedding_service.embed_video_scene(client_upload_temp_file_path)
         if raw_results is None or raw_results.size == 0:
             raise HTTPException(status_code=404, detail="No results found")
         
@@ -52,6 +58,9 @@ async def extract_embedding(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=str(e))
     
     finally:
+        if os.path.exists(client_upload_temp_file_path):
+            os.remove(client_upload_temp_file_path)
+
         if os.path.exists(temp_file_path):
             os.remove(temp_file_path)
 

@@ -1,7 +1,9 @@
 import os
 import cv2
+import ffmpeg
+import tempfile
 import traceback
-# import tempfile
+import subprocess
 import numpy as np
 from PIL import Image
 from pathlib import Path
@@ -20,8 +22,11 @@ onnxUrl = os.getenv("ONNX_MODEL_URL")
 
 parent_dir = Path(__file__).resolve().parent.parent
 
-path_onnx = Path("/app/onnx/visual.onnx")
-# path_onnx = parent_dir / "onnx" / "visual.onnx"
+path_onnx = Path(os.getenv("ONNX_MODEL_prod_PATH", parent_dir / "onnx" / "visual.onnx"))
+
+temp_dir = Path(os.getenv("TEMP_DIR_PATH", parent_dir / "temp"))
+
+os.makedirs(temp_dir, exist_ok=True)
 
 model_path=str(path_onnx)
 
@@ -90,6 +95,11 @@ class EmbeddingService(IEmbeddingService):
         
         try:
 
+            if self._is_av1(video_path):
+                logger.info(f"========⌚Video {video_path} is encoded with AV1 codec, proceeding to convert to H264 format...========")
+                video_path = self._convert_av1_to_h264(video_path)
+                logger.info(f"========✅Converted video to H264 format: {video_path}========")
+
             logger.info(f"========⌚initializing video scene embedding : {video_path}========")
 
             if not os.path.exists(model_path):
@@ -143,3 +153,35 @@ class EmbeddingService(IEmbeddingService):
         except Exception as e:
             logger.error(f"========❌Error embedding video scene {video_path}: {str(e)}\n{traceback.format_exc()}========")
             raise HTTPException(status_code=500, detail=f"{type(e).__name__}: {str(e)}")
+        
+
+    def _is_av1(self, video_path: str) -> bool:
+
+        logger.info(f"========⌚Checking if video {video_path} is encoded with AV1 codec========")
+        try:
+            probe = ffmpeg.probe(video_path)
+            for stream in probe['streams']:
+                if stream['codec_type'] == 'video' and stream['codec_name'].lower() == 'av1':
+                    return True
+            return False
+        
+        except Exception as e:
+            logger.warning(f"========❌Could not detect codec for {video_path}: {e}========")
+            return False
+
+
+    def _convert_av1_to_h264(self, video_path: str) -> str:
+
+        logger.info(f"========⌚Converting AV1 video {video_path} to H264 format========")
+        try:
+            output_path = os.path.join(temp_dir, "converted.mp4")
+            subprocess.run([
+                "ffmpeg", "-y", "-i", video_path,
+                "-c:v", "libx264", "-preset", "fast", "-crf", "23",
+                "-c:a", "copy", output_path
+            ], check=True)
+            return output_path
+        
+        except Exception as e:
+            logger.error(f"========❌Error converting AV1 video {video_path} to H264: {str(e)}========")
+            raise HTTPException(status_code=500, detail=f"Failed to convert AV1 video: {str(e)}")

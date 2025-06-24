@@ -1,4 +1,5 @@
 import logging
+import sys
 from pathlib import Path
 
 log_dir = Path(__file__).resolve().parent.parent / "logs"
@@ -9,13 +10,17 @@ log_file = log_dir / "app.log"
 # Create formatter
 formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
-# File handler
-file_handler = logging.FileHandler(log_file)
+# File handler with utf-8 encoding
+file_handler = logging.FileHandler(log_file, encoding="utf-8")
 file_handler.setLevel(logging.INFO)
 file_handler.setFormatter(formatter)
 
-# Console handler
-console_handler = logging.StreamHandler()
+# Console handler with utf-8 encoding
+console_handler = logging.StreamHandler(sys.stdout)
+try:
+    console_handler.stream.reconfigure(encoding="utf-8")
+except AttributeError:
+    pass
 console_handler.setLevel(logging.INFO)
 console_handler.setFormatter(formatter)
 
