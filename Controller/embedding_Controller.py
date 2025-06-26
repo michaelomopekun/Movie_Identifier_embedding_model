@@ -1,5 +1,6 @@
 import os
 import shutil
+from time import time
 from pathlib import Path
 from utils.logger import logger
 from Service.model_manager import model_manager
@@ -16,7 +17,8 @@ parent_dir = Path(__file__).resolve().parent.parent
 async def extract_embedding(file: UploadFile = File(...)):
 
     try:
-        
+        start_time = time()
+
         onnx_url = os.getenv("ONNX_MODEL_URL")
 
         parent = Path(os.getenv("ONNX_MODEL_prod_PATH", parent_dir / "onnx" / "visual.onnx"))
@@ -49,6 +51,13 @@ async def extract_embedding(file: UploadFile = File(...)):
             raise HTTPException(status_code=404, detail="No results found")
         
         result = raw_results
+
+        end_time = time()
+        elapsed_time = end_time - start_time
+
+        logger.info(f"=========================================================================================")
+        logger.info(f"==============⌚all processes completed in {elapsed_time:.2f} seconds.==============")
+        logger.info(f"=========================================================================================")
 
         return {"embedding": result}
 
